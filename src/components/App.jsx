@@ -13,26 +13,36 @@ export const App = () => {
     { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
   ];
 
-  function onLoadPage() {
-    const savedContacts = localStorage.getItem('contacts');
+  const useLocalStorage = (key, defaultValue) => {
+    const [state, setState] = useState(() => {
 
-    if (savedContacts !== null) {
-      const parsedContacts = JSON.parse(savedContacts);
-      return parsedContacts;
-    }
+      const savedContacts = localStorage.getItem('contacts');
 
-    return defaultContacts;
+      if (savedContacts !== null) {
+        const parsedContacts = JSON.parse(savedContacts);
+        return parsedContacts;
+      }
+
+      return defaultValue;
+
+    })
+
+    useEffect(() => {
+      localStorage.setItem(key, JSON.stringify(state));  
+    }, [key, state])
+
+    return [state, setState];
   }
 
 
-  const [contacts, setContacts] = useState(onLoadPage);
+  const [contacts, setContacts] = useLocalStorage('contacts', defaultContacts);
   const [filter, setFilter] = useState('');
 
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-    setContacts(contacts);
-  }, [contacts])
+  // useEffect(() => {
+  //   localStorage.setItem('contacts', JSON.stringify(contacts));
+  //   setContacts(contacts);
+  // }, [contacts])
 
   const addContact = newContact => {
     if (contacts.find(contact => contact.name.toLowerCase() === newContact.name.toLowerCase())) {
